@@ -15,10 +15,10 @@ class Params {
     static final int PATCH_X_Y_NUM = 20;
     
     //Initial mumber of white daisies.
-    static final double INI_WHITE = 180;
+    static final int INI_WHITE = 10;
     
     //Initial mumber of black daisies.
-    static final double INI_BLACK = 180;
+    static final int INI_BLACK = 10;
     
     // max age of daisy.
     static final int MAX_AGE = 25;
@@ -46,7 +46,7 @@ class Params {
     
     
   //high soalr luminosity
-    static final int TICKS = 10;
+    static final int TICKS = 1000;
     
     
   

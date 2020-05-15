@@ -12,5 +12,7 @@ public class main {
 		DaisyWorld dw = new DaisyWorld(2);
 		dw.execution();
 		//System.out.println();
+	
+		
 	}
 }

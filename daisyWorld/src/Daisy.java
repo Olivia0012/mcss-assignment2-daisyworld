@@ -9,29 +9,19 @@
 
 public class Daisy {
 	
-	private Boolean color;
+	private int color;// 0: white; 1: black.
 	private int age;
-//	private Patch patch;
 
-	public Daisy(Boolean color, int age) {
+	public Daisy(int color, int age) {
 		this.color = color;
 		this.age = age;
-	//	this.patch = location;
-	}
-/*
-	public Patch getPatch() {
-		return patch;
 	}
 
-	public void setPatch(Patch patch) {
-		this.patch = patch;
-	}
-*/
-	public Boolean getColor() {
+	public int getColor() {
 		return color;
 	}
 
-	public void setColor(Boolean color) {
+	public void setColor(int color) {
 		this.color = color;
 	}
 
