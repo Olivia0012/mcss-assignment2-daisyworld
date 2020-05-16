@@ -9,11 +9,11 @@
 
 
 public class Patch {
-	private Daisy daisy = null;
-	private int x;
-	private int y;
-	private double local_temp;
-	private double luminosity;
+	private Daisy daisy = null; // when there is no daisy in the patch, this will be null.
+	private int x; // number of the row.
+	private int y; // number of the column.
+	private double local_temp; // local temperature of each patch.
+	private double luminosity; // current luminosity.
 	
 	public Patch(Daisy daisy, double luminosity, int x, int y) {
 		this.daisy = daisy;
@@ -22,7 +22,7 @@ public class Patch {
 		this.y = y;
 	}
 	
-	
+	// Getter and setter functions of variables.
 	public Daisy getDaisy() {
 		return daisy;
 	}
@@ -32,7 +32,6 @@ public class Patch {
 	}
 	
 	
-
 	public double getLuminosity() {
 		return luminosity;
 	}
@@ -61,7 +60,10 @@ public class Patch {
 		this.y = y;
 	}
 
-
+	/*
+	 * calculate the local temperature based on luminosity with different albedo 
+	 * for daisies and empty patches.
+	 */
 	public double getLocal_temp() {
 		double absorbed_luminosity = 0;
 		double local_heat = 0;
@@ -81,7 +83,6 @@ public class Patch {
 			local_heat = 80;
 		}
 		local_temp = (local_temp + local_heat) / 2;
-	//	setLocal_temp(local_temp);
 		return local_temp;
 	}
 
@@ -89,9 +90,5 @@ public class Patch {
 	public void setLocal_temp(double local_temp) {
 		this.local_temp = local_temp;
 	}
-	
-	
-	
-	
 	
 }

@@ -9,10 +9,8 @@
 
 public class main {
 	public static void main(String [] args){
-		DaisyWorld dw = new DaisyWorld(2);
-		dw.execution();
-		//System.out.println();
+		DaisyWorld dw = new DaisyWorld(2); // the number is the type of solar luminosity. 2: our luminosity = 1.0.
+		dw.execution(); // patches updating funtion.
 	
-		
 	}
 }
