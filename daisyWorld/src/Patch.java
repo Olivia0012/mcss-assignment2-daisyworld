@@ -14,14 +14,32 @@ public class Patch {
 	private int y;
 	private double local_temp;
 	private double luminosity;
+
+
+ // Model Extension
+ // store a number betwen 0 and 1
+ // 0 = terrible, nothing will grow
+ // 1 = perfect conditions for growing
+	private double soil_quality;
 	
-	public Patch(Daisy daisy, double luminosity, int x, int y) {
+	public Patch(
+		Daisy daisy, 
+		double luminosity,
+		double soil_quality,
+		int x, int y
+		) {
 		this.daisy = daisy;
 		this.luminosity = luminosity;
 		this.x = x;
 		this.y = y;
+		this.soil_quality = soil_quality;
 	}
 	
+
+	public double getSoilQuality(){
+		return soil_quality;
+	}
+
 	
 	public Daisy getDaisy() {
 		return daisy;

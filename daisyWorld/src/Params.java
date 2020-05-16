@@ -48,7 +48,8 @@ class Params {
   //high soalr luminosity
     static final int TICKS = 1000;
     
-    
+    // good soil quality
+    static final double GOOD_SOIL_QUALITY = 0.5;
   
 
 }

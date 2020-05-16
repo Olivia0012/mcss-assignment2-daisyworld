@@ -37,11 +37,16 @@ public class DaisyWorld {
 
 	}
 
+	private double getRandomSoilQuality() {
+		return rnd.nextDouble();
+	}
+
 	public void execution() {
 	//	getGlobalTemp();
 		for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
 			for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
-				patches[x][y] = new Patch(null, solar_lum, x, y);
+				double soil_quality = getRandomSoilQuality();
+				patches[x][y] = new Patch(null, solar_lum, soil_quality, x, y);
 				patches[x][y].getLocal_temp();
 			}
 		getGlobalTemp();
@@ -81,10 +86,12 @@ public class DaisyWorld {
 			while (patches[x][y].getDaisy() == null) {
 				if (color == 0) {
 					Daisy wDaisy = new Daisy(0, rnd.nextInt(Params.MAX_AGE));
-					patches[x][y] = new Patch(wDaisy, solar_lum, x, y);
+					double soil_quality = getRandomSoilQuality();
+					patches[x][y] = new Patch(wDaisy, solar_lum, soil_quality, x, y);
 				} else {
 					Daisy bDaisy = new Daisy(1, rnd.nextInt(Params.MAX_AGE));
-					patches[x][y] = new Patch(bDaisy, solar_lum, x, y);
+					double soil_quality = getRandomSoilQuality();
+					patches[x][y] = new Patch(bDaisy, solar_lum, soil_quality, x, y);
 				}
 			}
 
@@ -97,6 +104,7 @@ public class DaisyWorld {
 			for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
 				if (patches[x][y].getDaisy() != null) {
 					int daisyAge = patches[x][y].getDaisy().getAge() + 1;
+					double soil_quality = patches[x][y].getSoilQuality();
 					patches[x][y].getDaisy().setAge(daisyAge);
 					if (daisyAge < Params.MAX_AGE) {
 						if(daisyAge < 2) break;
@@ -106,11 +114,20 @@ public class DaisyWorld {
 						if (randomValue < seed_threshold) {
 							Patch seedPlace = seed_place(x, y);
 							if (seedPlace != null) {
-								Daisy daisy = new Daisy(patches[x][y].getDaisy().getColor(),
-										0);
-								seedPlace.setDaisy(daisy);
-							//	System.out.println("x " + x + "y "+y+";  seedPlace.getX() " + seedPlace.getX()+ "  seedPlace.getY()" + seedPlace.getY());
-								patches[seedPlace.getX()][seedPlace.getY()] = seedPlace;
+
+								// Extended the model: 
+								// Soil quality has to be good enough for new daisies to grow
+								if(soil_quality>Params.GOOD_SOIL_QUALITY){
+									// Good soil quality
+									// System.out.println("Good soil quality: " + soil_quality);
+									Daisy daisy = new Daisy(patches[x][y].getDaisy().getColor(),
+									0);
+									seedPlace.setDaisy(daisy);
+									patches[seedPlace.getX()][seedPlace.getY()] = seedPlace;
+								}else {
+									// Bad soil quality
+									// System.out.println("Bad soil quality: " + soil_quality);
+								}
 							}
 						}
 					} else {
@@ -125,12 +142,14 @@ public class DaisyWorld {
 		int m = 0;
 		int n = 0;
 		Patch emptyPatches[] = new Patch[8];
+		double soil_quality = getRandomSoilQuality();
+
 		// up:
 		if (y == 0) {
 			if (patches[x][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[0] = new Patch(null, solar_lum, m, n);
+				emptyPatches[0] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 
@@ -138,7 +157,7 @@ public class DaisyWorld {
 			if (patches[x][y - 1].getDaisy() == null) {
 				m = x;
 				n = y - 1;
-				emptyPatches[0] = new Patch(null, solar_lum, m, n);
+				emptyPatches[0] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
@@ -148,7 +167,7 @@ public class DaisyWorld {
 			if(patches[x][y + 1].getDaisy() == null) {
 				m = x;
 				n = y + 1;
-				emptyPatches[1] = new Patch(null, solar_lum, m, n);
+				emptyPatches[1] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		
@@ -156,7 +175,7 @@ public class DaisyWorld {
 			if(patches[x][0].getDaisy() == null) {
 				m = x;
 				n = 0;
-				emptyPatches[1] = new Patch(null, solar_lum, m, n);
+				emptyPatches[1] = new Patch(null, solar_lum, soil_quality, m, n);
 				//return seed_Place;
 			}
 		}
@@ -166,14 +185,14 @@ public class DaisyWorld {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y;
-				emptyPatches[2] = new Patch(null, solar_lum, m, n);
+				emptyPatches[2] = new Patch(null, solar_lum, soil_quality, m, n);
 				//return seed_Place;
 			}
 		} else {
 			if (patches[x - 1][y].getDaisy() == null) {
 				m = x - 1;
 				n = y;
-				emptyPatches[2] = new Patch(null, solar_lum, m, n);
+				emptyPatches[2] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
@@ -183,7 +202,7 @@ public class DaisyWorld {
 			if (patches[x - 1][y - 1].getDaisy() == null) {
 				m = x - 1;
 				n = y - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
@@ -192,21 +211,21 @@ public class DaisyWorld {
 			if (patches[x - 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x - 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, soil_quality, m, n);
 				//return seed_Place;
 			}
 		} else if (x == 0 && y > 0) {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y - 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		} else {
 			if (patches[Params.PATCH_X_Y_NUM - 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
@@ -215,7 +234,7 @@ public class DaisyWorld {
 			if (patches[x - 1][y + 1].getDaisy() == null) {
 				m = x - 1;
 				n = y + 1;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
@@ -224,21 +243,21 @@ public class DaisyWorld {
 			if (patches[x - 1][0].getDaisy() == null) {
 				m = x - 1;
 				n = 0;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		} else if (x == 0 && y < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y + 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y + 1;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		} else {
 			if (patches[Params.PATCH_X_Y_NUM - 1][0].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = 0;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		}
@@ -248,7 +267,7 @@ public class DaisyWorld {
 			if (patches[x + 1][y].getDaisy() == null) {
 				m = x + 1;
 				n = y;
-				emptyPatches[5] = new Patch(null, solar_lum, m, n);
+				emptyPatches[5] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		}
@@ -257,7 +276,7 @@ public class DaisyWorld {
 			if (patches[0][y].getDaisy() == null) {
 				m = 0;
 				n = y;
-				emptyPatches[5] = new Patch(null, solar_lum, m, n);
+				emptyPatches[5] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		}
@@ -267,28 +286,28 @@ public class DaisyWorld {
 			if (patches[x + 1][y - 1].getDaisy() == null) {
 				m = x + 1;
 				n = y - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		} else if (x < Params.PATCH_X_Y_NUM - 1 && y == 0) {
 			if (patches[x + 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x + 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		} else if (x == Params.PATCH_X_Y_NUM - 1 && y > 0) {
 			if (patches[0][y - 1].getDaisy() == null) {
 				m = 0;
 				n = y - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		} else {
 			if (patches[0][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = 0;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, soil_quality, m, n);
 		//		return seed_Place;
 			}
 		}
@@ -297,28 +316,28 @@ public class DaisyWorld {
 			if (patches[x + 1][y + 1].getDaisy() == null) {
 				m = x + 1;
 				n = y + 1;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		} else if (x < Params.PATCH_X_Y_NUM - 1 && y == Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x + 1][0].getDaisy() == null) {
 				m = x + 1;
 				n = 0;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		} else if (x == Params.PATCH_X_Y_NUM - 1 && y < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[0][y + 1].getDaisy() == null) {
 				m = 0;
 				n = y + 1;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		} else {
 			if (patches[0][0].getDaisy() == null) {
 				m = 0;
 				n = 0;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, soil_quality, m, n);
 			//	return seed_Place;
 			}
 		}
