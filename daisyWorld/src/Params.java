@@ -1,5 +1,6 @@
 /**
  * Parameters for the JAVA Daisy World simulator.
+ * Changes the value of parameters to do experiments.
  *
  * @author Lu Wang
  * @Number 1054195
@@ -46,7 +47,7 @@ class Params {
     
     
   //high soalr luminosity
-    static final int TICKS = 1000;
+    static final int TICKS = 30;
     
     // good soil quality
     static final double GOOD_SOIL_QUALITY = 0.5;
