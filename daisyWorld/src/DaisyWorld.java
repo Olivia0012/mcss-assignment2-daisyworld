@@ -15,6 +15,8 @@ import java.util.Random;
 import java.lang.Math;
 
 public class DaisyWorld {
+	private CsvWriter csv_writer;
+
 	private double globalTemp; // global temperature
 	private int num_black; // number of balck daisies.
 	private int num_white; // number of white daisies.
@@ -25,7 +27,8 @@ public class DaisyWorld {
 	static Random rnd = new Random();
 
 	// constructor of the class.
-	public DaisyWorld(int scenario) {
+	public DaisyWorld(int scenario, CsvWriter csv_writer) {
+		this.csv_writer = csv_writer;
 		this.scenario = scenario;
 		if (scenario == 0) {
 			// the luminosity will change during ticks.
@@ -57,9 +60,9 @@ public class DaisyWorld {
 
 		// Count the number of daisies and empty patches.
 		getDaisy_Num();
-		System.out.println("White: " + num_white);
-		System.out.println("Black: " + num_black);
-		System.out.println("empty: " + empty);
+		csv_writer.WriteToCsv("White: " + num_white);
+		csv_writer.WriteToCsv("Black: " + num_black);
+		csv_writer.WriteToCsv("empty: " + empty);
 
 		/*
 		 * Update the patches for Params.TICKS times and record, calculate the gobal
@@ -78,8 +81,8 @@ public class DaisyWorld {
 
 			// Count the number of daisies and empty patches.
 			getDaisy_Num();
-			System.out.println("White: " + num_white);
-			System.out.println("Black: " + num_black);
+			csv_writer.WriteToCsv("White: " + num_white);
+			csv_writer.WriteToCsv("Black: " + num_black);
 
 			getGlobalTemp();// get initial global temperature.
 		}
@@ -397,7 +400,7 @@ public class DaisyWorld {
 			}
 		
 		globalTemp = tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM);
-		System.out.println("Global Temperature: " + tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM));
+		csv_writer.WriteToCsv("Global Temperature: " + tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM));
 		
 		return globalTemp; // return the global temperature after diffussion.
 	}
