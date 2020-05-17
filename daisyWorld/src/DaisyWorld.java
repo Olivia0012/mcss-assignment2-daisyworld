@@ -60,9 +60,7 @@ public class DaisyWorld {
 
 		// Count the number of daisies and empty patches.
 		getDaisy_Num();
-		csv_writer.WriteToCsv("White: " + num_white);
-		csv_writer.WriteToCsv("Black: " + num_black);
-		csv_writer.WriteToCsv("empty: " + empty);
+		csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, this.globalTemp));
 
 		/*
 		 * Update the patches for Params.TICKS times and record, calculate the gobal
@@ -81,8 +79,7 @@ public class DaisyWorld {
 
 			// Count the number of daisies and empty patches.
 			getDaisy_Num();
-			csv_writer.WriteToCsv("White: " + num_white);
-			csv_writer.WriteToCsv("Black: " + num_black);
+			csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, this.globalTemp));
 
 			getGlobalTemp();// get initial global temperature.
 		}
@@ -400,8 +397,9 @@ public class DaisyWorld {
 			}
 		
 		globalTemp = tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM);
-		csv_writer.WriteToCsv("Global Temperature: " + tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM));
 		
+		csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, globalTemp));
+
 		return globalTemp; // return the global temperature after diffussion.
 	}
 
