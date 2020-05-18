@@ -31,9 +31,13 @@ public class CsvWriter {
       column_names.add("NumberBlack");
       column_names.add("NumberEmpty");
       column_names.add("GlobalTemp");
-      if(Params.SHOW_RAIN_MAP) column_names.add("RainMap");
-      if(Params.SHOW_WATER_LEVEL) column_names.add("WaterLevel");
       if(Params.SHOW_DAISY_MAP) column_names.add("DaisyMap");
+
+      // display rain columns
+      if(Params.RAIN_ENABLED){
+        if(Params.SHOW_RAIN_MAP) column_names.add("RainMap");
+        if(Params.SHOW_WATER_LEVEL) column_names.add("WaterLevel");
+      }
 
       // write to file
       write(column_names);
@@ -57,9 +61,13 @@ public class CsvWriter {
     values.add((Integer.toString(message.getNumberBlack())));
     values.add((Integer.toString(message.getNumberEmpty())));
     values.add(Double.toString(message.getGlobalTemp()));
-    if(Params.SHOW_RAIN_MAP) values.add(message.getFormattedRainMap());
-    if(Params.SHOW_WATER_LEVEL) values.add(message.getFormattedWaterLevel());
     if(Params.SHOW_DAISY_MAP) values.add(message.getFormattedDaisies());
+    
+    // display rain output
+    if(Params.RAIN_ENABLED){
+      if(Params.SHOW_RAIN_MAP) values.add(message.getFormattedRainMap());
+      if(Params.SHOW_WATER_LEVEL) values.add(message.getFormattedWaterLevel());
+    }
 
     // write to file
     write(values);

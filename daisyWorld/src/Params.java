@@ -48,6 +48,15 @@ class Params {
     //total number of ticks
     static final int TICKS = 1000;
 
+    //toggle csv output
+    static final boolean SHOW_DAISY_MAP = true;
+
+
+    // ==============================================
+
+    // toggle rain extension
+    static final boolean RAIN_ENABLED = true;
+
     // rain scenario
     static final RainScenario RAIN_SCENARIO = RainScenario.RAIN_RANDOMLY;
 
@@ -72,6 +81,5 @@ class Params {
     //toggle csv output
     static final boolean SHOW_RAIN_MAP = true;
     static final boolean SHOW_WATER_LEVEL = true;
-    static final boolean SHOW_DAISY_MAP = true;
 
 }

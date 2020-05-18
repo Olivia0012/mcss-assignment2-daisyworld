@@ -87,7 +87,9 @@ public class DaisyWorld {
 				}
 			}
 
-			daisyConsumeWater(); // Daisies consume water
+      if(Params.RAIN_ENABLED){
+				daisyConsumeWater(); // Daisies consume water
+      }
 
 			checkSurvival();// Sprout new daisies.
 
@@ -97,11 +99,13 @@ public class DaisyWorld {
 			double global_temp = getGlobalTemp();// get initial global temperature.
 			setGlobalTemp(global_temp); // set the global temperature
 
-			// Update hydration
-			updateHydration();
-
-			// Update the rain
-			moveRain();
+      if(Params.RAIN_ENABLED){
+				// Update hydration
+				updateHydration();
+	
+				// Update the rain
+				moveRain();
+      }
 
 			// Output current simulation state to CSV file
 			csv_writer.WriteToCsv(new ExperimentResult(
@@ -149,16 +153,19 @@ public class DaisyWorld {
 
 				// when the patch with a daisy.
 				if (patches[x][y].getDaisy() != null) {
-					// if there is a drought, daisy dies
-					if(patches[x][y].getWaterLevel() <= Params.DROUGHT_HYDRATION_LEVEL){
-						patches[x][y].setDaisy(null);
-						continue;
-					}
 
-					// if there is a flood, daisy dies
-					if(patches[x][y].getWaterLevel() >= Params.FLOOD_HYDRATION_LEVEL){
-						patches[x][y].setDaisy(null);
-						continue;
+					if(Params.RAIN_ENABLED){
+						// if there is a drought, daisy dies
+						if(patches[x][y].getWaterLevel() <= Params.DROUGHT_HYDRATION_LEVEL){
+							patches[x][y].setDaisy(null);
+							continue;
+						}
+	
+						// if there is a flood, daisy dies
+						if(patches[x][y].getWaterLevel() >= Params.FLOOD_HYDRATION_LEVEL){
+							patches[x][y].setDaisy(null);
+							continue;
+						}
 					}
 
 					// increment its age.
