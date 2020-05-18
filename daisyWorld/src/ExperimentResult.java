@@ -32,15 +32,53 @@ class ExperimentResult {
   public int getNumberBlack() {return this.number_black;}
   public int getNumberEmpty() {return this.number_empty;}
   public double getGlobalTemp() {return this.global_temperature;}
+  
   public String getFormattedRainMap() {
-    String rain_volumes = "";
+    StringBuilder formatted_output = new StringBuilder();
     for(int i=0; i<this.patches.length; i++){
-      rain_volumes += "[ ";
+      formatted_output.append("[ ");
       for(int j=0; j<this.patches[i].length; j++){
-        rain_volumes+=this.patches[i][j].getRainVolume()+" ";
+        boolean raining = this.patches[i][j].isRaining();
+        formatted_output.append(raining ? "Y" : "N");
+        formatted_output.append(" ");
       }
-      rain_volumes += "] ";
+      formatted_output.append("] ");
     }
-    return rain_volumes;
+    return formatted_output.toString();
+  }
+
+  public String getFormattedWaterLevel() {
+    StringBuilder formatted_output = new StringBuilder();
+    for(int i=0; i<this.patches.length; i++){
+      formatted_output.append("[ ");
+      for(int j=0; j<this.patches[i].length; j++){
+        formatted_output.append(this.patches[i][j].getWaterLevel());
+        formatted_output.append(" ");
+      }
+      formatted_output.append("] ");
+    }
+    return formatted_output.toString();
+  }
+
+  public String getFormattedDaisies() {
+    StringBuilder formatted_output = new StringBuilder();
+    for(int i=0; i<this.patches.length; i++){
+      formatted_output.append("[ ");
+      for(int j=0; j<this.patches[i].length; j++){
+        Daisy daisy = this.patches[i][j].getDaisy();
+        if(daisy != null){
+          if(daisy.getColor() == 0){
+            formatted_output.append("W");
+          } else {
+            formatted_output.append("B");
+          }
+        } else {
+          formatted_output.append("_");
+        }
+        formatted_output.append(" ");
+      }
+      formatted_output.append("] ");
+    }
+    return formatted_output.toString();
   }
 }

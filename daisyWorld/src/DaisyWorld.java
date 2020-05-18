@@ -17,7 +17,6 @@ public class DaisyWorld {
 	private int step_number = 0;
 	private CsvWriter csv_writer;
 
-	private Rain rain; // controls when, where and how much to rain.
 	private double globalTemp; // global temperature
 	private int num_black; // number of balck daisies.
 	private int num_white; // number of white daisies.
@@ -41,7 +40,6 @@ public class DaisyWorld {
 		} else if (scenario == 3) {
 			this.solar_lum = Params.HIGH_SOLAR_LUMINOSITY;
 		}
-		this.rain = new Rain();
 	}
 
 	// execution for testing.
@@ -51,7 +49,7 @@ public class DaisyWorld {
 		// initialise the patches with empty patch.
 		for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
 			for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
-				patches[x][y] = new Patch(null, solar_lum, x, y);
+				patches[x][y] = new Patch(null, solar_lum, x, y, Params.INI_SOIL_HYDRATION);
 				patches[x][y].getLocal_temp();
 			}
 
@@ -87,6 +85,9 @@ public class DaisyWorld {
 					solar_lum -= 0.0025;
 				}
 			}
+
+			daisyConsumeWater(); // Daisies consume water
+
 			checkSurvival();// Sprout new daisies.
 
 			// Count the number of daisies and empty patches.
@@ -95,9 +96,11 @@ public class DaisyWorld {
 			double global_temp = getGlobalTemp();// get initial global temperature.
 			setGlobalTemp(global_temp); // set the global temperature
 
+			// Update hydration
+			updateHydration();
+
 			// Update the rain
-			int[][] rain_volumes = rain.getNewRainVolumes(patches);
-			updateRain(rain_volumes);
+			moveRain();
 
 			// Output current simulation state to CSV file
 			csv_writer.WriteToCsv(new ExperimentResult(
@@ -112,10 +115,10 @@ public class DaisyWorld {
 
 	}
 
-	public void updateRain(int[][] rain_volumes){
-		for(int i=0; i<rain_volumes.length; i++)
-			for(int j=0; j<rain_volumes[i].length; j++)
-				patches[i][j].setRainVolume(rain_volumes[i][j]);
+	public void updateRain(boolean[][] is_raining){
+		for(int i=0; i<is_raining.length; i++)
+			for(int j=0; j<is_raining[i].length; j++)
+				patches[i][j].setIsRaining(is_raining[i][j]);
 	}
 
 	// seeding daisies randomly at the begining.
@@ -129,11 +132,11 @@ public class DaisyWorld {
 				if (color == 0) {
 					// white daisy.
 					Daisy wDaisy = new Daisy(0, rnd.nextInt(Params.MAX_AGE));
-					patches[x][y] = new Patch(wDaisy, solar_lum, x, y);
+					patches[x][y] = new Patch(wDaisy, solar_lum, x, y, patches[x][y].getWaterLevel());
 				} else {
 					// black daisy.
 					Daisy bDaisy = new Daisy(1, rnd.nextInt(Params.MAX_AGE));
-					patches[x][y] = new Patch(bDaisy, solar_lum, x, y);
+					patches[x][y] = new Patch(bDaisy, solar_lum, x, y, patches[x][y].getWaterLevel());
 				}
 			}
 
@@ -151,6 +154,18 @@ public class DaisyWorld {
 
 				// when the patch with a daisy.
 				if (patches[x][y].getDaisy() != null) {
+					// if there is a drought, daisy dies
+					if(patches[x][y].getWaterLevel() <= Params.DROUGHT_HYDRATION_LEVEL){
+						patches[x][y].setDaisy(null);
+						continue;
+					}
+
+					// if there is a flood, daisy dies
+					if(patches[x][y].getWaterLevel() >= Params.FLOOD_HYDRATION_LEVEL){
+						patches[x][y].setDaisy(null);
+						continue;
+					}
+
 					// increment its age.
 					int daisyAge = patches[x][y].getDaisy().getAge() + 1;
 					// update the daisy's age.
@@ -207,13 +222,13 @@ public class DaisyWorld {
 			if (patches[x][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[0] = new Patch(null, solar_lum, m, n);
+				emptyPatches[0] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[x][y - 1].getDaisy() == null) {
 				m = x;
 				n = y - 1;
-				emptyPatches[0] = new Patch(null, solar_lum, m, n);
+				emptyPatches[0] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 
@@ -222,14 +237,14 @@ public class DaisyWorld {
 			if (patches[x][y + 1].getDaisy() == null) {
 				m = x;
 				n = y + 1;
-				emptyPatches[1] = new Patch(null, solar_lum, m, n);
+				emptyPatches[1] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 
 		} else {
 			if (patches[x][0].getDaisy() == null) {
 				m = x;
 				n = 0;
-				emptyPatches[1] = new Patch(null, solar_lum, m, n);
+				emptyPatches[1] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 
@@ -238,13 +253,13 @@ public class DaisyWorld {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y;
-				emptyPatches[2] = new Patch(null, solar_lum, m, n);
+				emptyPatches[2] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[x - 1][y].getDaisy() == null) {
 				m = x - 1;
 				n = y;
-				emptyPatches[2] = new Patch(null, solar_lum, m, n);
+				emptyPatches[2] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 
@@ -253,25 +268,25 @@ public class DaisyWorld {
 			if (patches[x - 1][y - 1].getDaisy() == null) {
 				m = x - 1;
 				n = y - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}else if (x > 0 && y == 0) {
 			if (patches[x - 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x - 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x == 0 && y > 0) {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y - 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[Params.PATCH_X_Y_NUM - 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[3] = new Patch(null, solar_lum, m, n);
+				emptyPatches[3] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 		// left-down: the one below the left.
@@ -279,25 +294,25 @@ public class DaisyWorld {
 			if (patches[x - 1][y + 1].getDaisy() == null) {
 				m = x - 1;
 				n = y + 1;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}else if (x > 0 && y == Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x - 1][0].getDaisy() == null) {
 				m = x - 1;
 				n = 0;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x == 0 && y < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[Params.PATCH_X_Y_NUM - 1][y + 1].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = y + 1;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[Params.PATCH_X_Y_NUM - 1][0].getDaisy() == null) {
 				m = Params.PATCH_X_Y_NUM - 1;
 				n = 0;
-				emptyPatches[4] = new Patch(null, solar_lum, m, n);
+				emptyPatches[4] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 
@@ -309,13 +324,13 @@ public class DaisyWorld {
 			if (patches[x + 1][y].getDaisy() == null) {
 				m = x + 1;
 				n = y;
-				emptyPatches[5] = new Patch(null, solar_lum, m, n);
+				emptyPatches[5] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}else {
 			if (patches[0][y].getDaisy() == null) {
 				m = 0;
 				n = y;
-				emptyPatches[5] = new Patch(null, solar_lum, m, n);
+				emptyPatches[5] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 
@@ -324,25 +339,25 @@ public class DaisyWorld {
 			if (patches[x + 1][y - 1].getDaisy() == null) {
 				m = x + 1;
 				n = y - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x < Params.PATCH_X_Y_NUM - 1 && y == 0) {
 			if (patches[x + 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x + 1;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x == Params.PATCH_X_Y_NUM - 1 && y > 0) {
 			if (patches[0][y - 1].getDaisy() == null) {
 				m = 0;
 				n = y - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[0][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = 0;
 				n = Params.PATCH_X_Y_NUM - 1;
-				emptyPatches[6] = new Patch(null, solar_lum, m, n);
+				emptyPatches[6] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 		
@@ -351,25 +366,25 @@ public class DaisyWorld {
 			if (patches[x + 1][y + 1].getDaisy() == null) {
 				m = x + 1;
 				n = y + 1;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x < Params.PATCH_X_Y_NUM - 1 && y == Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x + 1][0].getDaisy() == null) {
 				m = x + 1;
 				n = 0;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else if (x == Params.PATCH_X_Y_NUM - 1 && y < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[0][y + 1].getDaisy() == null) {
 				m = 0;
 				n = y + 1;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		} else {
 			if (patches[0][0].getDaisy() == null) {
 				m = 0;
 				n = 0;
-				emptyPatches[7] = new Patch(null, solar_lum, m, n);
+				emptyPatches[7] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
 		
@@ -517,6 +532,47 @@ public class DaisyWorld {
 		}
 		patch.setLocal_temp(difTemp);
 		return difTemp;
+	}
+
+
+	
+  // Update rain locations
+  private void moveRain(){
+    for(int i=0; i<patches.length; i++)
+      for(int j=0; j<patches[i].length; j++) {
+				switch(Params.RAIN_SCENARIO){
+					case ALWAYS_RAIN:
+					patches[i][j].setIsRaining(true);
+					break;
+					case NEVER_RAIN:
+					patches[i][j].setIsRaining(false);
+					break;
+				}
+				
+			}
+  }
+
+	// Update soil water level
+	private void updateHydration(){
+		for(int i=0; i<patches.length; i++)
+			for(int j=0; j<patches[i].length; j++)
+				if(patches[i][j].isRaining())
+					patches[i][j].setWaterLevel(
+						patches[i][j].getWaterLevel() + Params.HYDRATION_FROM_RAIN
+					);
+	}
+
+	// Update the soil water because daisies are using it
+	private void daisyConsumeWater(){
+		for(int i=0; i<patches.length; i++)
+			for(int j=0; j<patches[i].length; j++)
+				if(patches[i][j].getDaisy() != null) {
+					int new_water_level = patches[i][j].getWaterLevel() - Params.DAISY_WATER_CONSUMPTION;
+					patches[i][j].setWaterLevel(
+						new_water_level<0 ? 0 : new_water_level
+					);
+				}
+
 	}
 
 }
