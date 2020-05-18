@@ -17,6 +17,7 @@ public class DaisyWorld {
 	private int step_number = 0;
 	private CsvWriter csv_writer;
 
+	private Rain rain; // controls when, where and how much to rain.
 	private double globalTemp; // global temperature
 	private int num_black; // number of balck daisies.
 	private int num_white; // number of white daisies.
@@ -40,7 +41,7 @@ public class DaisyWorld {
 		} else if (scenario == 3) {
 			this.solar_lum = Params.HIGH_SOLAR_LUMINOSITY;
 		}
-
+		this.rain = new Rain();
 	}
 
 	// execution for testing.
@@ -64,7 +65,14 @@ public class DaisyWorld {
 		getDaisy_Num();
 
 		// Output current simulation state to CSV file
-		csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty, this.globalTemp));
+		csv_writer.WriteToCsv(new ExperimentResult(
+			this.step_number, 
+			this.num_white, 
+			this.num_black, 
+			this.empty, 
+			this.globalTemp,
+			this.patches
+			));
 
 		/*
 		 * Update the patches for Params.TICKS times and record, calculate the gobal
@@ -87,10 +95,27 @@ public class DaisyWorld {
 			double global_temp = getGlobalTemp();// get initial global temperature.
 			setGlobalTemp(global_temp); // set the global temperature
 
+			// Update the rain
+			int[][] rain_volumes = rain.getNewRainVolumes(patches);
+			updateRain(rain_volumes);
+
 			// Output current simulation state to CSV file
-			csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty, this.globalTemp));
+			csv_writer.WriteToCsv(new ExperimentResult(
+				this.step_number, 
+				this.num_white, 
+				this.num_black, 
+				this.empty, 
+				this.globalTemp,
+				this.patches
+				));
 		}
 
+	}
+
+	public void updateRain(int[][] rain_volumes){
+		for(int i=0; i<rain_volumes.length; i++)
+			for(int j=0; j<rain_volumes[i].length; j++)
+				patches[i][j].setRainVolume(rain_volumes[i][j]);
 	}
 
 	// seeding daisies randomly at the begining.

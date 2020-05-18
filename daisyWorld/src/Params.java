@@ -46,10 +46,11 @@ class Params {
     static final double HIGH_SOLAR_LUMINOSITY = 1.4;
     
     
-  //high soalr luminosity
-    static final int TICKS = 30;
+    //total number of ticks
+    static final int TICKS = 1000;
     
     
-  
+    //toggle csv output
+    static final boolean SHOW_RAIN_MAP = false;
 
 }

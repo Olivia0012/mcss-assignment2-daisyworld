@@ -5,6 +5,7 @@
  */
 
 import java.io.*;
+import java.util.ArrayList;
 
 public class CsvWriter {
   String file_name;
@@ -22,8 +23,18 @@ public class CsvWriter {
 
       // create new csv file to write the data to
       this.file_writer = new FileWriter(this.file_name, true); 
-      this.file_writer.write("StepNumber,NumberWhite,NumberBlack,NumberEmpty,GlobalTemp\n");
-      this.file_writer.flush();
+
+      // csv column names
+      ArrayList<String> column_names = new ArrayList<>();
+      column_names.add("StepNumber");
+      column_names.add("NumberWhite");
+      column_names.add("NumberBlack");
+      column_names.add("NumberEmpty");
+      column_names.add("GlobalTemp");
+      if(Params.SHOW_RAIN_MAP) column_names.add("RainMap");
+
+      // write to file
+      write(column_names);
 
       // let the caller know that the file was created successfully
       return true;
@@ -37,19 +48,17 @@ public class CsvWriter {
   }
 
   public void WriteToCsv(ExperimentResult message){
-    try{
-      // write simulation result to file
-      this.file_writer.write(
-        message.getStepNumber()+","+
-        message.getNumberWhite()+","+
-        message.getNumberBlack()+","+
-        message.getNumberEmpty()+","+
-        message.getGlobalTemp()+
-        "\n");
-      this.file_writer.flush();
-    } catch( Exception e) {
-      System.out.println("Error: could not append to file. "+e.getMessage());
-    }
+    // values to write to file
+    ArrayList<String> values = new ArrayList<>();
+    values.add(Integer.toString(message.getStepNumber()));
+    values.add((Integer.toString(message.getNumberWhite())));
+    values.add((Integer.toString(message.getNumberBlack())));
+    values.add((Integer.toString(message.getNumberEmpty())));
+    values.add(Double.toString(message.getGlobalTemp()));
+    if(Params.SHOW_RAIN_MAP) values.add(message.getFormattedRainMap());
+
+    // write to file
+    write(values);
   }
 
   public void CloseWriter(){
@@ -58,5 +67,24 @@ public class CsvWriter {
     } catch( Exception e) {
       System.out.println(e.getMessage());
     }
+  }
+
+  private void write(ArrayList<String> values){
+    try{
+      // write simulation result to file
+      this.file_writer.write(buildCsvString(values)+"\n");
+      this.file_writer.flush();
+    } catch( Exception e) {
+      System.out.println("Error: could not append to file. "+e.getMessage());
+    }
+  }
+
+  private String buildCsvString(ArrayList<String> values){
+    StringBuilder csvBuilder = new StringBuilder();
+    for(int i=0; i<values.size(); i++) {
+      csvBuilder.append(values.get(i));
+      if(i!=values.size()-1) csvBuilder.append(",");
+    }
+    return csvBuilder.toString();
   }
 }

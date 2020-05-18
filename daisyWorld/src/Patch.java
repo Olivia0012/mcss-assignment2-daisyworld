@@ -14,12 +14,14 @@ public class Patch {
 	private int y; // number of the column.
 	private double local_temp; // local temperature of each patch.
 	private double luminosity; // current luminosity.
+	private int rain_volume; // current local rain volume.
 	
 	public Patch(Daisy daisy, double luminosity, int x, int y) {
 		this.daisy = daisy;
 		this.luminosity = luminosity;
 		this.x = x;
 		this.y = y;
+		this.rain_volume = 0;
 	}
 	
 	// Getter and setter functions of variables.
@@ -55,9 +57,16 @@ public class Patch {
 		return y;
 	}
 
-
 	public void setY(int y) {
 		this.y = y;
+	}
+
+	public int getRainVolume() {
+		return this.rain_volume;
+	}
+
+	public void setRainVolume(int volume) {
+		this.rain_volume = volume;
 	}
 
 	/*
