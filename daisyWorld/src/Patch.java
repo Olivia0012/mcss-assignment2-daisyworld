@@ -15,13 +15,29 @@ public class Patch {
 	private double local_temp; // local temperature of each patch.
 	private double luminosity; // current luminosity.
 	
-	public Patch(Daisy daisy, double luminosity, int x, int y) {
+	// Model Extension
+	// store a number betwen 0 and 1
+	// 0 = terrible, nothing will grow
+	// 1 = perfect conditions for growing
+	private double soil_quality;
+
+	public Patch(
+		Daisy daisy, 
+		double luminosity,
+		double soil_quality,
+		int x, int y
+		) {
 		this.daisy = daisy;
 		this.luminosity = luminosity;
 		this.x = x;
 		this.y = y;
+		this.soil_quality = soil_quality;
 	}
-	
+
+	public double getSoilQuality(){
+		return soil_quality;
+	}
+
 	// Getter and setter functions of variables.
 	public Daisy getDaisy() {
 		return daisy;
