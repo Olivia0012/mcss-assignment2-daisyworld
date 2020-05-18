@@ -12,9 +12,9 @@
  */
 
 import java.util.Random;
-import java.lang.Math;
 
 public class DaisyWorld {
+	private int step_number = 0;
 	private CsvWriter csv_writer;
 
 	private double globalTemp; // global temperature
@@ -45,6 +45,8 @@ public class DaisyWorld {
 
 	// execution for testing.
 	public void execution() {
+		this.step_number = 0; // reset step_number
+
 		// initialise the patches with empty patch.
 		for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
 			for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
@@ -60,18 +62,20 @@ public class DaisyWorld {
 
 		// Count the number of daisies and empty patches.
 		getDaisy_Num();
-		csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, this.globalTemp));
+
+		// Output current simulation state to CSV file
+		csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty, this.globalTemp));
 
 		/*
 		 * Update the patches for Params.TICKS times and record, calculate the gobal
 		 * temperature after each update, and record the changes of the daisy numbers.
 		 */
-		for (int i = 0; i < Params.TICKS; i++) {
+		for (this.step_number = 1; this.step_number < Params.TICKS; this.step_number++) {
 			if (scenario == 0) {
-				if (i > 200 && i <= 400) {
+				if (this.step_number > 200 && this.step_number <= 400) {
 					solar_lum += 0.005;
 				}
-				if (i > 600 && i <= 850) {
+				if (this.step_number > 600 && this.step_number <= 850) {
 					solar_lum -= 0.0025;
 				}
 			}
@@ -79,9 +83,12 @@ public class DaisyWorld {
 
 			// Count the number of daisies and empty patches.
 			getDaisy_Num();
-			csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, this.globalTemp));
 
-			getGlobalTemp();// get initial global temperature.
+			double global_temp = getGlobalTemp();// get initial global temperature.
+			setGlobalTemp(global_temp); // set the global temperature
+
+			// Output current simulation state to CSV file
+			csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty, this.globalTemp));
 		}
 
 	}
@@ -397,8 +404,6 @@ public class DaisyWorld {
 			}
 		
 		globalTemp = tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM);
-		
-		csv_writer.WriteToCsv(new ExperimentResult(num_white, num_black, empty, globalTemp));
 
 		return globalTemp; // return the global temperature after diffussion.
 	}
