@@ -49,7 +49,7 @@ class Params {
     static final int TICKS = 1000;
 
     // rain scenario
-    static final RainScenario RAIN_SCENARIO = RainScenario.ALWAYS_RAIN;
+    static final RainScenario RAIN_SCENARIO = RainScenario.RAIN_RANDOMLY;
 
     // initial water level in the soil
     static final int INI_SOIL_HYDRATION = 10;

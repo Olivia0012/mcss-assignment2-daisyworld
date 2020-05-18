@@ -40,6 +40,7 @@ public class DaisyWorld {
 		} else if (scenario == 3) {
 			this.solar_lum = Params.HIGH_SOLAR_LUMINOSITY;
 		}
+
 	}
 
 	// execution for testing.
@@ -113,12 +114,6 @@ public class DaisyWorld {
 				));
 		}
 
-	}
-
-	public void updateRain(boolean[][] is_raining){
-		for(int i=0; i<is_raining.length; i++)
-			for(int j=0; j<is_raining[i].length; j++)
-				patches[i][j].setIsRaining(is_raining[i][j]);
 	}
 
 	// seeding daisies randomly at the begining.
@@ -534,8 +529,6 @@ public class DaisyWorld {
 		return difTemp;
 	}
 
-
-	
   // Update rain locations
   private void moveRain(){
     for(int i=0; i<patches.length; i++)
@@ -546,6 +539,11 @@ public class DaisyWorld {
 					break;
 					case NEVER_RAIN:
 					patches[i][j].setIsRaining(false);
+					break;
+					case RAIN_RANDOMLY:
+					boolean rain = rnd.nextInt(100) >50;
+					if(rain) patches[i][j].setIsRaining(true);
+					else patches[i][j].setIsRaining(false);
 					break;
 				}
 				
@@ -574,5 +572,4 @@ public class DaisyWorld {
 				}
 
 	}
-
 }
