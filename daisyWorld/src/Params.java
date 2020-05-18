@@ -51,6 +51,9 @@ class Params {
     // rain scenario
     static final RainScenario RAIN_SCENARIO = RainScenario.RAIN_RANDOMLY;
 
+    // possibility of rain
+    static final int POSSIBLITY_OF_RAIN = 20;
+
     // initial water level in the soil
     static final int INI_SOIL_HYDRATION = 10;
     

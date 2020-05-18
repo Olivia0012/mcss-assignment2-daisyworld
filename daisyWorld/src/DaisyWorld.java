@@ -541,7 +541,7 @@ public class DaisyWorld {
 					patches[i][j].setIsRaining(false);
 					break;
 					case RAIN_RANDOMLY:
-					boolean rain = rnd.nextInt(100) >50;
+					boolean rain = rnd.nextInt(100)<Params.POSSIBLITY_OF_RAIN;
 					if(rain) patches[i][j].setIsRaining(true);
 					else patches[i][j].setIsRaining(false);
 					break;
