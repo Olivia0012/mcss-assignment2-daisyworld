@@ -13,13 +13,13 @@
 class Params {
 	
 	//Number of x and y of patch array.
-    static final int PATCH_X_Y_NUM = 20;
+    static final int PATCH_X_Y_NUM = 5;
     
     //Initial mumber of white daisies.
-    static final int INI_WHITE = 10;
+    static final int INI_WHITE = 5;
     
     //Initial mumber of black daisies.
-    static final int INI_BLACK = 10;
+    static final int INI_BLACK = 5;
     
     // max age of daisy.
     static final int MAX_AGE = 25;
@@ -44,12 +44,42 @@ class Params {
     
     //high soalr luminosity
     static final double HIGH_SOLAR_LUMINOSITY = 1.4;
+
+    //total number of ticks
+    static final int TICKS = 1000;
+
+    //toggle csv output
+    static final boolean SHOW_DAISY_MAP = true;
+
+
+    // ==============================================
+
+    // toggle rain extension
+    static final boolean RAIN_ENABLED = true;
+
+    // rain scenario
+    static final RainScenario RAIN_SCENARIO = RainScenario.RAIN_RANDOMLY;
+
+    // possibility of rain
+    static final int POSSIBLITY_OF_RAIN = 20;
+
+    // initial water level in the soil
+    static final int INI_SOIL_HYDRATION = 10;
     
+    // hydration from rain
+    static final int HYDRATION_FROM_RAIN = 4;
+
+    // drown from flooding
+    static final int FLOOD_HYDRATION_LEVEL = 20;
+
+    // die from drought
+    static final int DROUGHT_HYDRATION_LEVEL = 0;
     
-  //high soalr luminosity
-    static final int TICKS = 30;
-    
-    
-  
+    // daily water consumption by a daisy
+    static final int DAISY_WATER_CONSUMPTION = 1;
+
+    //toggle csv output
+    static final boolean SHOW_RAIN_MAP = true;
+    static final boolean SHOW_WATER_LEVEL = true;
 
 }

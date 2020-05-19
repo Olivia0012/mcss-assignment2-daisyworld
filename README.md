@@ -4,5 +4,11 @@
 
 ```
 javac main.java
-java main "C:/JESS_DRIVE/Learn/SWEN90004 - 2020 S1 - Modelling Complex Software Systems/mcss-assignment2-daisyworld/file1.csv"
+java main "C:/JESS_DRIVE/Learn/SWEN90004 - 2020 S1 - Modelling Complex Software Systems/mcss-assignment2-daisyworld/ExportSimulationResult.csv"
+```
+
+## Delete class files
+
+```
+del /f *.class
 ```

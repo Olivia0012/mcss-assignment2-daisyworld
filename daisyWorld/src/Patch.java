@@ -14,12 +14,16 @@ public class Patch {
 	private int y; // number of the column.
 	private double local_temp; // local temperature of each patch.
 	private double luminosity; // current luminosity.
+	private boolean is_raining; // current local rain volume.
+	private int water_level; // current amount of water in the soil.
 	
-	public Patch(Daisy daisy, double luminosity, int x, int y) {
+	public Patch(Daisy daisy, double luminosity, int x, int y, int water_level) {
 		this.daisy = daisy;
 		this.luminosity = luminosity;
 		this.x = x;
 		this.y = y;
+		this.is_raining = false;
+		this.water_level = water_level;
 	}
 	
 	// Getter and setter functions of variables.
@@ -55,9 +59,24 @@ public class Patch {
 		return y;
 	}
 
-
 	public void setY(int y) {
 		this.y = y;
+	}
+
+	public boolean isRaining() {
+		return this.is_raining;
+	}
+
+	public void setIsRaining(boolean raining) {
+		this.is_raining = raining;
+	}
+
+	public int getWaterLevel(){
+		return this.water_level;
+	}
+
+	public void setWaterLevel(int water_level){
+		this.water_level = water_level;
 	}
 
 	/*
