@@ -86,6 +86,12 @@ public class DaisyWorld {
 					solar_lum -= 0.0025;
 				}
 			}
+			
+			for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
+				for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
+					patches[x][y].setLuminosity(solar_lum);
+					patches[x][y].getLocal_temp();
+				}
 
       if(Params.RAIN_ENABLED){
 				daisyConsumeWater(); // Daisies consume water
