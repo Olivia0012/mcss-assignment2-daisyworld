@@ -79,11 +79,16 @@ public class Patch {
 		this.water_level = water_level;
 	}
 
+	
+	public double getLocal_temp() {
+		return this.local_temp;
+	}
+
 	/*
 	 * calculate the local temperature based on luminosity with different albedo 
 	 * for daisies and empty patches.
 	 */
-	public double getLocal_temp() {
+	public void cal_localTemp() {
 		double absorbed_luminosity = 0;
 		double local_heat = 0;
 		if (daisy == null) {
@@ -102,9 +107,8 @@ public class Patch {
 			local_heat = 80;
 		}
 		local_temp = (local_temp + local_heat) / 2;
-		return local_temp;
+		setLocal_temp(local_temp);
 	}
-
 
 	public void setLocal_temp(double local_temp) {
 		this.local_temp = local_temp;

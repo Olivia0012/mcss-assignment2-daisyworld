@@ -13,25 +13,25 @@
 class Params {
 	
 	//Number of x and y of patch array.
-    static final int PATCH_X_Y_NUM = 5;
+    static final int PATCH_X_Y_NUM = 30;
     
     //Initial mumber of white daisies.
-    static final int INI_WHITE = 5;
+    static final int INI_WHITE = 180;
     
     //Initial mumber of black daisies.
-    static final int INI_BLACK = 5;
+    static final int INI_BLACK = 180;
     
     // max age of daisy.
     static final int MAX_AGE = 25;
 
     // albedo of white daisy
-    static final double ALBEDO_WHITE = 0.5;
+    static final double ALBEDO_WHITE = 0.75;
     
     // albedo of black daisy
-    static final double ALBEDO_BLACK = 0.2;
+    static final double ALBEDO_BLACK = 0.25;
     
     // albedo of empty patch
-    static final double ALBEDO_SURFACE = 0.3;
+    static final double ALBEDO_SURFACE = 1;
     
     // initial solar luminosity of ramp up ramp down
     static final double RAMP_UP_RAMP_DOWN = 0.8;
@@ -40,7 +40,7 @@ class Params {
     static final double LOW_SOLAR_LUMINOSITY = 0.6;
     
     // our solar luminosity
-    static final double OUR_SOLAR_LUMINOSITY = 1.0;
+    static final double OUR_SOLAR_LUMINOSITY = 0.8;
     
     //high soalr luminosity
     static final double HIGH_SOLAR_LUMINOSITY = 1.4;
@@ -49,13 +49,13 @@ class Params {
     static final int TICKS = 1000;
 
     //toggle csv output
-    static final boolean SHOW_DAISY_MAP = true;
+    static final boolean SHOW_DAISY_MAP = false;
 
 
     // ==============================================
 
     // toggle rain extension
-    static final boolean RAIN_ENABLED = true;
+    static final boolean RAIN_ENABLED = false;
 
     // rain scenario
     static final RainScenario RAIN_SCENARIO = RainScenario.RAIN_RANDOMLY;

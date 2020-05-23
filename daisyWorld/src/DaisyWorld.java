@@ -51,10 +51,11 @@ public class DaisyWorld {
 		for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
 			for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
 				patches[x][y] = new Patch(null, solar_lum, x, y, Params.INI_SOIL_HYDRATION);
-				patches[x][y].getLocal_temp();
+				patches[x][y].cal_localTemp();
 			}
 
-		getGlobalTemp();// get initial global temperature.
+		setGlobalTemp(getGlobalTemp());// get initial global temperature.
+		System.out.println("0: " + this.globalTemp);
 
 		// Seeding two daisies randomly in the patches.
 		seedDaisyRandomly(1, Params.INI_BLACK);
@@ -64,14 +65,8 @@ public class DaisyWorld {
 		getDaisy_Num();
 
 		// Output current simulation state to CSV file
-		csv_writer.WriteToCsv(new ExperimentResult(
-			this.step_number, 
-			this.num_white, 
-			this.num_black, 
-			this.empty, 
-			this.globalTemp,
-			this.patches
-			));
+		csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty,
+				this.globalTemp, this.patches));
 
 		/*
 		 * Update the patches for Params.TICKS times and record, calculate the gobal
@@ -87,15 +82,22 @@ public class DaisyWorld {
 				}
 			}
 			
+			// update local temperature to each patch.
 			for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
 				for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
 					patches[x][y].setLuminosity(solar_lum);
-					patches[x][y].getLocal_temp();
+					patches[x][y].cal_localTemp();
 				}
 
-      if(Params.RAIN_ENABLED){
+			// update local temperature with diffusion.
+			for (int x = 0; x < Params.PATCH_X_Y_NUM; x++)
+				for (int y = 0; y < Params.PATCH_X_Y_NUM; y++) {
+					patches[x][y].setLocal_temp(diffuse(patches[x][y], x, y));
+				}
+
+			if (Params.RAIN_ENABLED) {
 				daisyConsumeWater(); // Daisies consume water
-      }
+			}
 
 			checkSurvival();// Sprout new daisies.
 
@@ -105,23 +107,17 @@ public class DaisyWorld {
 			double global_temp = getGlobalTemp();// get initial global temperature.
 			setGlobalTemp(global_temp); // set the global temperature
 
-      if(Params.RAIN_ENABLED){
+			if (Params.RAIN_ENABLED) {
 				// Update hydration
 				updateHydration();
-	
+
 				// Update the rain
 				moveRain();
-      }
+			}
 
 			// Output current simulation state to CSV file
-			csv_writer.WriteToCsv(new ExperimentResult(
-				this.step_number, 
-				this.num_white, 
-				this.num_black, 
-				this.empty, 
-				this.globalTemp,
-				this.patches
-				));
+			csv_writer.WriteToCsv(new ExperimentResult(this.step_number, this.num_white, this.num_black, this.empty,
+					this.globalTemp, this.patches));
 		}
 
 	}
@@ -160,15 +156,15 @@ public class DaisyWorld {
 				// when the patch with a daisy.
 				if (patches[x][y].getDaisy() != null) {
 
-					if(Params.RAIN_ENABLED){
+					if (Params.RAIN_ENABLED) {
 						// if there is a drought, daisy dies
-						if(patches[x][y].getWaterLevel() <= Params.DROUGHT_HYDRATION_LEVEL){
+						if (patches[x][y].getWaterLevel() <= Params.DROUGHT_HYDRATION_LEVEL) {
 							patches[x][y].setDaisy(null);
 							continue;
 						}
-	
+
 						// if there is a flood, daisy dies
-						if(patches[x][y].getWaterLevel() >= Params.FLOOD_HYDRATION_LEVEL){
+						if (patches[x][y].getWaterLevel() >= Params.FLOOD_HYDRATION_LEVEL) {
 							patches[x][y].setDaisy(null);
 							continue;
 						}
@@ -196,7 +192,7 @@ public class DaisyWorld {
 								Daisy daisy = new Daisy(patches[x][y].getDaisy().getColor(), 0); // new born daisy.
 								seedPlace.setDaisy(daisy);
 								// seeding the new born to the suitable patches.
-								patches[seedPlace.getX()][seedPlace.getY()] = seedPlace; 
+								patches[seedPlace.getX()][seedPlace.getY()] = seedPlace;
 							}
 						}
 					} else {
@@ -206,24 +202,24 @@ public class DaisyWorld {
 				}
 			}
 	}
-	
 
-	/* Finding an empty patch for seeding new daisies from one of the patch's 8 neighbours.
-	 * when the patch is empty, put it into the candidate list, then randomly choose one 
-	 * from this list.
-	 * Description: This daisy world is round, so the last row will be the first row's neighbour,  
-	 * the same as the columns, e.g.: when the position is in the first column, then the up 
-	 * neighbour would be the same row in the last column, etc.
+	/*
+	 * Finding an empty patch for seeding new daisies from one of the patch's 8
+	 * neighbours. when the patch is empty, put it into the candidate list, then
+	 * randomly choose one from this list. Description: This daisy world is round,
+	 * so the last row will be the first row's neighbour, the same as the columns,
+	 * e.g.: when the position is in the first column, then the up neighbour would
+	 * be the same row in the last column, etc.
 	 */
 	public Patch seed_place(int x, int y) {
 		Patch seed_Place = null;
 		int m = 0;
 		int n = 0;
 		Patch emptyPatches[] = new Patch[8];
-		
+
 		// above: the above one.
-		
-		// when the position is in the first column, then the up 
+
+		// when the position is in the first column, then the up
 		// neighbour would be the same row in the last column.
 		if (y == 0) {
 			// when the patch has no daisy on it, put it into the candidate list.
@@ -278,7 +274,7 @@ public class DaisyWorld {
 				n = y - 1;
 				emptyPatches[3] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
-		}else if (x > 0 && y == 0) {
+		} else if (x > 0 && y == 0) {
 			if (patches[x - 1][Params.PATCH_X_Y_NUM - 1].getDaisy() == null) {
 				m = x - 1;
 				n = Params.PATCH_X_Y_NUM - 1;
@@ -304,7 +300,7 @@ public class DaisyWorld {
 				n = y + 1;
 				emptyPatches[4] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
-		}else if (x > 0 && y == Params.PATCH_X_Y_NUM - 1) {
+		} else if (x > 0 && y == Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x - 1][0].getDaisy() == null) {
 				m = x - 1;
 				n = 0;
@@ -325,8 +321,8 @@ public class DaisyWorld {
 		}
 
 		// right: the one on the right.
-		
-		// when the position is in the last row, then the right 
+
+		// when the position is in the last row, then the right
 		// neighbour would be the one in the same column in the first row.
 		if (x < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x + 1][y].getDaisy() == null) {
@@ -334,7 +330,7 @@ public class DaisyWorld {
 				n = y;
 				emptyPatches[5] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
-		}else {
+		} else {
 			if (patches[0][y].getDaisy() == null) {
 				m = 0;
 				n = y;
@@ -368,7 +364,7 @@ public class DaisyWorld {
 				emptyPatches[6] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
-		
+
 		// right-down: the one below the right.
 		if (x < Params.PATCH_X_Y_NUM - 1 && y < Params.PATCH_X_Y_NUM - 1) {
 			if (patches[x + 1][y + 1].getDaisy() == null) {
@@ -395,8 +391,8 @@ public class DaisyWorld {
 				emptyPatches[7] = new Patch(null, solar_lum, m, n, patches[m][n].getWaterLevel());
 			}
 		}
-		
-		//Choose one empty patch from the 8 neighbours.
+
+		// Choose one empty patch from the 8 neighbours.
 		for (int i = 0; i < 8; i++) {
 			int k = rnd.nextInt(7);
 			while (emptyPatches[k] != null) {
@@ -408,7 +404,6 @@ public class DaisyWorld {
 		return seed_Place;
 	}
 
-	
 	// Calculate the number of daisies and empty patches.
 	public void getDaisy_Num() {
 		int countWhite = 0;
@@ -450,7 +445,7 @@ public class DaisyWorld {
 				// get the total diffused temperature.
 				tempDif += diffuse(patches[i][j], i, j);
 			}
-		
+
 		globalTemp = tempDif / (Params.PATCH_X_Y_NUM * Params.PATCH_X_Y_NUM);
 
 		return globalTemp; // return the global temperature after diffussion.
@@ -461,11 +456,11 @@ public class DaisyWorld {
 	}
 
 	/*
-	 * calculate the temperature with 50 % diffusion of daisies and patches around the daisy, 
-	 * including the left, the left-up, the left-down, the right, the right-up, the right-down, the above
-	 * and the below ones. 
-	 * Description: the world is round, so the last row daisies would be those in the first row's neighbours,
-	 * the same as column.
+	 * calculate the temperature with 50 % diffusion of daisies and patches around
+	 * the daisy, including the left, the left-up, the left-down, the right, the
+	 * right-up, the right-down, the above and the below ones. Description: the
+	 * world is round, so the last row daisies would be those in the first row's
+	 * neighbours, the same as column.
 	 */
 	public double diffuse(Patch patch, int x, int y) {
 		double difTemp = 0;
@@ -538,50 +533,48 @@ public class DaisyWorld {
 		} else {
 			difTemp += patches[0][0].getLocal_temp() / 16;
 		}
-		patch.setLocal_temp(difTemp);
+
 		return difTemp;
 	}
 
-  // Update rain locations
-  private void moveRain(){
-    for(int i=0; i<patches.length; i++)
-      for(int j=0; j<patches[i].length; j++) {
-				switch(Params.RAIN_SCENARIO){
-					case ALWAYS_RAIN:
+	// Update rain locations
+	private void moveRain() {
+		for (int i = 0; i < patches.length; i++)
+			for (int j = 0; j < patches[i].length; j++) {
+				switch (Params.RAIN_SCENARIO) {
+				case ALWAYS_RAIN:
 					patches[i][j].setIsRaining(true);
 					break;
-					case NEVER_RAIN:
+				case NEVER_RAIN:
 					patches[i][j].setIsRaining(false);
 					break;
-					case RAIN_RANDOMLY:
-					boolean rain = rnd.nextInt(100)<Params.POSSIBLITY_OF_RAIN;
-					if(rain) patches[i][j].setIsRaining(true);
-					else patches[i][j].setIsRaining(false);
+				case RAIN_RANDOMLY:
+					boolean rain = rnd.nextInt(100) < Params.POSSIBLITY_OF_RAIN;
+					if (rain)
+						patches[i][j].setIsRaining(true);
+					else
+						patches[i][j].setIsRaining(false);
 					break;
 				}
-				
+
 			}
-  }
+	}
 
 	// Update soil water level
-	private void updateHydration(){
-		for(int i=0; i<patches.length; i++)
-			for(int j=0; j<patches[i].length; j++)
-				if(patches[i][j].isRaining())
-					patches[i][j].setWaterLevel(
-						patches[i][j].getWaterLevel() + Params.HYDRATION_FROM_RAIN
-					);
+	private void updateHydration() {
+		for (int i = 0; i < patches.length; i++)
+			for (int j = 0; j < patches[i].length; j++)
+				if (patches[i][j].isRaining())
+					patches[i][j].setWaterLevel(patches[i][j].getWaterLevel() + Params.HYDRATION_FROM_RAIN);
 	}
 
 	// Update the soil water because daisies are using it
-	private void daisyConsumeWater(){
-		for(int i=0; i<patches.length; i++)
-			for(int j=0; j<patches[i].length; j++)
-				if(patches[i][j].getDaisy() != null) {
+	private void daisyConsumeWater() {
+		for (int i = 0; i < patches.length; i++)
+			for (int j = 0; j < patches[i].length; j++)
+				if (patches[i][j].getDaisy() != null) {
 					int new_water_level = patches[i][j].getWaterLevel() - Params.DAISY_WATER_CONSUMPTION;
-					patches[i][j].setWaterLevel(
-						new_water_level<0 ? 0 : new_water_level
-					);
+					patches[i][j].setWaterLevel(new_water_level < 0 ? 0 : new_water_level);
 				}
 
 	}

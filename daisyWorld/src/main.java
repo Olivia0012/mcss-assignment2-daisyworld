@@ -10,7 +10,7 @@
 public class main {
 	public static void main(String [] args){
  		// create an initialise the csvWriter
-		CsvWriter csv_writer = new CsvWriter(args[0]);
+		CsvWriter csv_writer = new CsvWriter("EX-5-s-1.csv");
 
 		// if file created correctly from the arguements
 		if(csv_writer.CreateFile()){
