@@ -1,4 +1,5 @@
 # mcss-assignment2-daisyworld
+The Daisyworld model is based on the “Gaia Hypothesis”, which states that the Earth is a single and self-regulating system. In particular, this model will explore how the temperature could affect living organisms: white and black daisies.
 
 ## Running the program
 
